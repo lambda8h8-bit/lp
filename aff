@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input id="a" placeholder="Numbers (10,20,30,40)" size="30">
+  <input id="b" placeholder="New value" value="50">
+  <button onclick="run()">Run</button>
+  <pre id="o"></pre>
+
+  <script>
+    function run() {
+      let arr = a.value.split(",").map(Number);
+      let log = "Before  : " + arr.join(", ") + "\n";
+
+      arr.shift();
+      arr.push(Number(b.value));
+      log += "After   : " + arr.join(", ") + "\n";
+
+      arr.unshift(5);
+      log += "unshift : " + arr.join(", ") + "\n";
+
+      arr.pop();
+      log += "pop     : " + arr.join(", ") + "\n";
+
+      log += "length  : " + arr.length + "\n";
+      log += "includes: " + arr.includes(30) + "\n";
+      log += "indexOf : " + arr.indexOf(30) + "\n";
+      log += "sorted  : " + [...arr].sort((a,b)=>a-b).join(", ") + "\n";
+      log += "reverse : " + [...arr].reverse().join(", ") + "\n";
+      log += "sum     : " + arr.reduce((s,x)=>s+x, 0) + "\n";
+
+      o.textContent = log;
+    }
+  </script>
+</body>
+</html>
