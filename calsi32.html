@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Basic Calculator</title>
+</head>
+<body>
+
+<h2>Basic Calculator</h2>
+<div id="display">0</div>
+
+<div>
+  <button onclick="current='0'; previous=null; operator=null; reset=false; display.textContent='0'">C</button>
+  <button onclick="if(!reset) current=current.length>1?current.slice(0,-1):'0'; display.textContent=current">⌫</button>
+  <button onclick="operator='÷'; previous=parseFloat(current); reset=true">÷</button>
+  <button onclick="operator='×'; previous=parseFloat(current); reset=true">×</button>
+</div>
+<div>
+  <button onclick="current=(current==='0'||reset)?'7':current+'7'; reset=false; display.textContent=current">7</button>
+  <button onclick="current=(current==='0'||reset)?'8':current+'8'; reset=false; display.textContent=current">8</button>
+  <button onclick="current=(current==='0'||reset)?'9':current+'9'; reset=false; display.textContent=current">9</button>
+  <button onclick="operator='−'; previous=parseFloat(current); reset=true">−</button>
+</div>
+<div>
+  <button onclick="current=(current==='0'||reset)?'4':current+'4'; reset=false; display.textContent=current">4</button>
+  <button onclick="current=(current==='0'||reset)?'5':current+'5'; reset=false; display.textContent=current">5</button>
+  <button onclick="current=(current==='0'||reset)?'6':current+'6'; reset=false; display.textContent=current">6</button>
+  <button onclick="operator='+'; previous=parseFloat(current); reset=true">+</button>
+</div>
+<div>
+  <button onclick="current=(current==='0'||reset)?'1':current+'1'; reset=false; display.textContent=current">1</button>
+  <button onclick="current=(current==='0'||reset)?'2':current+'2'; reset=false; display.textContent=current">2</button>
+  <button onclick="current=(current==='0'||reset)?'3':current+'3'; reset=false; display.textContent=current">3</button>
+  <button onclick="if(operator){const b=parseFloat(current); if(operator==='+')current=String(previous+b); if(operator==='−')current=String(previous-b); if(operator==='×')current=String(previous*b); if(operator==='÷')current=String(previous/b); previous=null; operator=null; reset=true; display.textContent=current}">=</button>
+</div>
+<div>
+  <button onclick="current=(current==='0'||reset)?'0':current+'0'; reset=false; display.textContent=current">0</button>
+  <button onclick="if(!current.includes('.')) current+='.'; display.textContent=current">.</button>
+</div>
+
+<script>
+  let current = "0";
+  let previous = null;
+  let operator = null;
+  let reset = false;
+  const display = document.getElementById("display");
+</script>
+
+</body>
+</html>
