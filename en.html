@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input id="n" placeholder="Number"> <input id="nk" value="3" size="3"> <button onclick="num()">Go</button>
+  <pre id="no"></pre>
+
+  <input id="t" placeholder="Text" size="40"> <input id="tk" value="3" size="3"> <button onclick="txt()">Go</button>
+  <pre id="to"></pre>
+
+  <script>
+    function num() {
+      const s = n.value, k = ((+nk.value % 10) + 10) % 10;
+      const f = (str, d) => str.replace(/\d/g, c => (+c + d + 10) % 10);
+      const e = f(s, k);
+      no.textContent = `${s} → ${e} → ${f(e, -k)}`;
+    }
+
+    function txt() {
+      const s = t.value, k = ((+tk.value % 26) + 26) % 26;
+      const f = (str, d) => str.replace(/[a-z]/gi, c => {
+        const x = c.charCodeAt(0), a = x < 97 ? 65 : 97;
+        return String.fromCharCode(a + (x - a + d + 26) % 26);
+      });
+      const e = f(s, k);
+      to.textContent = `${s} → ${e} → ${f(e, -k)}`;
+    }
+  </script>
+</body>
+</html>
