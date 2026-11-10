@@ -1,0 +1,155 @@
+Here is the complete, step-by-step procedure to run **Programs 44, 45, 47, and 48** from scratch in your Linux terminal. 
+
+*(Note: Your screenshot had 44, 45, 47, and 48. I will cover those exact 4 programs).*
+
+### 🛠️ Step 0: Setup & Cleanup
+First, stop any running Tomcat server by pressing `Ctrl+C` in the terminal where it's running. Then, run these commands to create the correct folder structure and download the MySQL driver (needed for 47 & 48):
+
+```bash
+# Go to your home directory
+cd ~
+
+# Create the correct folder structure
+mkdir -p MyApp/WEB-INF/classes
+mkdir -p MyApp/WEB-INF/lib
+
+# Download the MySQL JDBC Driver directly into your app
+wget -P MyApp/WEB-INF/lib https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar
+```
+
+---
+
+### 📝 Step 1: Create all 4 Java Files
+Copy and paste this entire block into your terminal. It will generate all 4 files inside `~/MyApp`.
+
+```bash
+cd ~/MyApp
+
+# -----------------------------------------
+# 44: Simple Servlet
+cat << 'EOF' > P44.java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.*;
+@WebServlet("/p44")
+public class P44 extends HttpServlet {
+    protected void doGet(HttpServletRequest q, HttpServletResponse r) throws IOException {
+        r.getWriter().print("<h2>Program 44: Simple Servlet Works!</h2>");
+    }
+}
+EOF
+
+# -----------------------------------------
+# 45: Session Tracking
+cat << 'EOF' > P45.java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.*;
+@WebServlet("/p45")
+public class P45 extends HttpServlet {
+    protected void doGet(HttpServletRequest q, HttpServletResponse r) throws IOException {
+        HttpSession s = q.getSession();
+        Integer c = (Integer) s.getAttribute("visits");
+        c = (c == null) ? 1 : c + 1;
+        s.setAttribute("visits", c);
+        r.getWriter().print("<h2>Program 45: Visit Count = " + c + "</h2><p>Refresh to increase!</p>");
+    }
+}
+EOF
+
+# -----------------------------------------
+# 47: JDBC Database Access (Read from authors table)
+# NOTE: Change "root", "root" to your actual MySQL username/password
+cat << 'EOF' > P47.java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.*;
+import java.sql.*;
+@WebServlet("/p47")
+public class P47 extends HttpServlet {
+    protected void doGet(HttpServletRequest q, HttpServletResponse r) throws IOException {
+        try (var c = DriverManager.getConnection("jdbc:mysql://localhost/cse1", "root", "root");
+             var rs = c.createStatement().executeQuery("SELECT * FROM authors")) {
+            r.getWriter().print("<h2>Program 47: Database Data</h2>");
+            while (rs.next()) r.getWriter().print(rs.getInt("id") + " - " + rs.getString("name") + " - " + rs.getString("email") + "<br>");
+        } catch (Exception e) {
+            r.getWriter().print("<h2>DB Error:</h2> " + e.getMessage());
+        }
+    }
+}
+EOF
+
+# -----------------------------------------
+# 48: Full Web App (DB + Session)
+cat << 'EOF' > P48.java
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.*;
+import java.sql.*;
+@WebServlet("/p48")
+public class P48 extends HttpServlet {
+    protected void doGet(HttpServletRequest q, HttpServletResponse r) throws IOException {
+        r.getWriter().print("<h2>Program 48: Full Web App</h2>");
+        // 1. Session Tracking
+        HttpSession s = q.getSession();
+        Integer c = (Integer) s.getAttribute("hits");
+        c = (c == null) ? 1 : c + 1;
+        s.setAttribute("hits", c);
+        r.getWriter().print("Session Hits: " + c + "<br><br>");
+        
+        // 2. Database Access
+        try (var conn = DriverManager.getConnection("jdbc:mysql://localhost/cse1", "root", "root");
+             var rs = conn.createStatement().executeQuery("SELECT name FROM authors LIMIT 1")) {
+            if (rs.next()) r.getWriter().print("DB Connected. First Author: " + rs.getString("name"));
+        } catch (Exception e) {
+            r.getWriter().print("DB Error: " + e.getMessage());
+        }
+    }
+}
+EOF
+```
+
+---
+
+### ⚙️ Step 2: Compile and Deploy
+Run these commands to compile the Java files and copy the app to Tomcat:
+
+```bash
+cd ~/MyApp
+# Compile all Java files
+javac -cp ~/apache-tomcat-10.1.34/lib/servlet-api.jar -d WEB-INF/classes *.java
+
+# Deploy the app to Tomcat
+cp -r ~/MyApp ~/apache-tomcat-10.1.34/webapps/
+```
+
+---
+
+### 🚀 Step 3: Start Tomcat
+Start the server:
+```bash
+~/apache-tomcat-10.1.34/bin/catalina.sh run
+```
+
+*(Wait a few seconds until you see "Server startup in [XXXX] milliseconds" in the terminal).*
+
+---
+
+### 🌐 Step 4: Test in Browser
+Open your browser and test the following URLs:
+
+1. **Program 44:** `http://localhost:8080/MyApp/p44`
+   * *What you'll see:* "Program 44: Simple Servlet Works!"
+2. **Program 45:** `http://localhost:8080/MyApp/p45`
+   * *What you'll see:* "Visit Count = 1". Refresh the page. It will say "Visit Count = 2".
+3. **Program 47:** `http://localhost:8080/MyApp/p47`
+   * *What you'll see:* Data from your `authors` table. *(If you get an error, it means MySQL isn't running or your username/password is different).*
+4. **Program 48:** `http://localhost:8080/MyApp/p48`
+   * *What you'll see:* Both the session hit count and the database author name on the same page.
+
+*(To stop the server, press `Ctrl+C` in your terminal).*
+
+---
+
+### ⚠️ Important Note for 47 & 48 (Database)
+If you get a **DB Error**, you need to change `"root", "root"` in the Java files to match your actual MySQL credentials (e.g., `"be2k261", "be2k26@1"` as shown in your `php.doc`), recompile, and restart Tomcat.
